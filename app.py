@@ -8,17 +8,20 @@ import datetime
 import urllib.parse
 import certifi
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = Flask(__name__)
 CORS(app)
 
-app.config['JWT_SECRET_KEY'] = 'super-secret-class-key-2428' 
+app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY', 'super-secret-fallback-key')
 jwt = JWTManager(app)
 
 # MongoDB Configuration
-username = urllib.parse.quote_plus('adit2428cs1345_db_user')
-password = urllib.parse.quote_plus('adit@1234') # UPDATE THIS
-MONGO_URI = f"mongodb+srv://{username}:{password}@cluster0.452pmlf.mongodb.net/?appName=Cluster0"
+MONGO_URI = os.environ.get('MONGO_URI')
+if not MONGO_URI:
+    raise ValueError("No MONGO_URI set for Flask application")
 
 client = MongoClient(MONGO_URI, tlsCAFile=certifi.where())
 db = client['class_management_db']
